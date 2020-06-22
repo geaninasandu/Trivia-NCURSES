@@ -1,0 +1,8 @@
+cmake-build-debug/*
+CMakeLists.txt
+.idea/*
+<<<<<<< HEAD
+trivia
+=======
+README.txt
+>>>>>>> 68e9e67a0a736562e396a1f3a884d13a28be2873

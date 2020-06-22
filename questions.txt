@@ -1,0 +1,20 @@
+What is error 404?;Request Timeout;Site Access Forbidden;Syntax Error;Site Not Found;d
+What kind of file does extension .dll usually refer to?;System file;Image file;Movie file;Internet location;a
+A wireless host needs to request an IP address. What protocol would be used to process the request?;FTP;HTTP;DHCP;ICMP;c
+Which technology provides a solution for PC virtualization?;system clustering;hypervisor;terminal services;RAID;b
+Which connection provides a secure CLI session with encryption to a remote device?;console connection;AUX connection;Telnet connection;SSH connection;d
+Every number system has a base, which is called...;Index;Subscript;Radix;None of the above;c
+Which layer of the OSI model is responsible for physical addressing and the procedures used to access media?;application;data link;network;transport;b
+Which wireless security mode supports government grade security and offers both personal and enterprise authentication?;WEP;WPA;WPA2;LEAP;c
+The maximum count which a 6-bit binary word can represent is...;63;64;65;127;a
+The cat command is used to...;capture a file;display a file;print a file;copy a file;b
+Which is the first electronic programmable computer built?;Colossus;Z3;EDVAC;ENIAC;d
+The compiler converts your C++ instructions into...;edited code;source code;object code;translated code;c
+What allows multiple programs to run on a computer?;OS;NIC;GUI;API;a
+What are the main building blocks of a database?;Lists;Tables;Queries;Data;b
+The step-by-step instructions that solve a problem are called...;an algorithm;a list;a plan;a sequential structure;a
+What is the default file system used during a fresh installation of Windows 7?;FAT16;FAT32;HPFS;NTFS;d
+What do you call the translator which takes assembly language program as input & produce machine language code as output?;Interpreter;Debugger;Assembler;Compiler;c
+When a key is pressed on the keyboard, which standard is used for converting the keystroke into the corresponding bits?;ASCII;ANSI;EBCDIC;ISO;b
+Who built the first Mechanical Calculator?;Howard Aiken;Joseph Marie Jacquard;John Mauchly;Blaise Pascal;d
+The computer program language which is widely used in computer science and engineering and also in business is...;COBOL;FORTRAN;PASCAL;LISP;c
