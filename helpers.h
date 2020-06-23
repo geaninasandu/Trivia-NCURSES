@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#define FALSE 0
+#define TRUE 1
 #define GREEN_GREEN 1
 #define RED_RED 2
 #define MAGENTA_MAGENTA 3

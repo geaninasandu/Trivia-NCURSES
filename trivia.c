@@ -302,30 +302,6 @@
 //}
 //
 //
-//void display_5050(WINDOW *help, int cols, int box_color,
-//                  int text_color) { //afiseaza caseta pentru optiunea 50-50
-//    int j, k;
-//    wattron(help, COLOR_PAIR(box_color));
-//    for (j = 0; j < 3; j++)
-//        for (k = 0; k < 30; k++)
-//            mvwprintw(help, j, cols / 3 - 33 + k, "-");
-//    wattron(help, COLOR_PAIR(text_color));
-//    mvwprintw(help, 1, cols / 3 - 31, "E. 50-50");
-//    wrefresh(help);
-//}
-//
-//void display_skip_question(WINDOW *help, int cols, int box_color,
-//                           int text_color) { //afiseaza caseta pentru optiunea Skip the question
-//    int j, k;
-//    wattron(help, COLOR_PAIR(box_color));
-//    for (j = 0; j < 3; j++)
-//        for (k = 0; k < 30; k++)
-//            mvwprintw(help, j, cols / 3 + 3 + k, "-");
-//    wattron(help, COLOR_PAIR(text_color));
-//    mvwprintw(help, 1, cols / 3 + 5, "F. Skip the question");
-//    wrefresh(help);
-//}
-//
 //int generate_random_answer(int correct_answer) { /*genereaza un numar random de la 1 la 4 care reprezinta numarul raspunsului
 //ramas dupa 50-50, pe langa raspunsul corect*/
 //    int answer_left;
@@ -576,7 +552,17 @@ int main(int argc, char **argv) {
             player_name = set_name_window(rows, cols);
             player_name[strlen(player_name) - 1] = '\0';
 
-            start_new_game(questions, questions_number, player_name, rows, cols);
+            Game game;
+            game = (Game) {
+                    .player_name = strdup(player_name),
+                    .score = 0,
+                    .wrong_answers = 0,
+                    .right_answers = 0,
+                    .used_5050 = FALSE,
+                    .used_skip = FALSE,
+            };
+
+            start_new_game(game, questions, questions_number, player_name, rows, cols);
 
             wrefresh(background);
 
