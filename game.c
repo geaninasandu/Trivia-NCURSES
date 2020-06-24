@@ -1,6 +1,6 @@
 #include "game.h"
 
-Game start_new_game(Game game, Question *questions, const int questions_number, const char *player_name, const int
+Game *start_new_game(Game *game, Question *questions, const int questions_number, const char *player_name, const int
 rows, const int cols) {
     const int game_w = cols - 20;
     const int game_h = rows / 2;
@@ -13,96 +13,141 @@ rows, const int cols) {
     /* Show the helping options window */
     WINDOW *help_window = display_helping_options(game_h, game_y, cols);
 
-    /* Print each question and its answers, then  */
-    for (int i = game.question_index; i < questions_number; ++i) {
+    char hidden_answers[] = {'x', 'x'};
+
+    /* Print each question and its answers, then check the input received from the user */
+    for (int i = game->question_index; i < questions_number; ++i) {
         wclear(new_game);
         wrefresh(new_game);
         configure_window(new_game, game_h, game_w);
 
-        game.question_index = i;
+        game->question_index = i;
 
         /* Show the time and score panels */
-        display_scoreboard(game.score, game.right_answers, game.wrong_answers, rows, cols);
+        display_scoreboard(game->score, game->right_answers, game->wrong_answers, rows, cols);
         display_time_window(player_name, rows, cols);
 
         /* Display the current question and its answers */
         display_question(new_game, questions[i].question, i + 1, game_h, game_w);
         display_all_answers(new_game, questions[i], game_w, game_h);
 
-        int chosen_answer = choose_answer(new_game, questions[i], game, game_w, game_h);
+        /* Get the return flag of the answer function */
+        int chosen_answer = choose_answer(new_game, help_window, questions[i], game, hidden_answers, game_w, game_h);
 
         switch (chosen_answer) {
             case RIGHT_ANSWER:
-                game.score += 10;
-                game.right_answers++;
+                game->score += 10;
+                game->right_answers++;
                 break;
 
             case WRONG_ANSWER:
-                game.score -= 5;
-                game.wrong_answers++;
+                game->score -= 5;
+                game->wrong_answers++;
                 break;
 
             case SKIP_QUESTION:
-                game.used_skip = TRUE;
-                display_answer(help_window, "Skip the question", 'F', BLUE_BLUE, BLUE_BLUE, 51, 0);
-                wrefresh(help_window);
                 continue;
 
-            case FIFTY_FIFTY:
-                game.used_5050 = TRUE;
-                break;
+            case QUIT:
+                return game;
 
+            default:
+                break;
         }
 
         sleep(1);
     }
+
+    return game;
 }
 
-int choose_answer(WINDOW *new_game, const Question question, Game game, const int game_w, const int game_h) {
-    char *hidden_answers = NULL;
-    char chosen_answer = wgetch(new_game);
+/**
+ * Get input characters from the user and return the corresponding flags meant to change the game state;
+ *
+ * @param new_game                  the game window;
+ * @param help_window               the helping options window;
+ * @param question                  the current question;
+ * @param game                      the struct storing the game state;
+ * @param hidden_answers            the array of characters containing the answers hidden after 50-50;
+ * @return                          a flag in the array {WRONG_ANSWER, RIGHT_ANSWER, SKIP_QUESTION};
+ */
+int choose_answer(WINDOW *new_game, WINDOW *help_window, const Question question, Game *game, char *hidden_answers,
+        const int game_w, const int game_h) {
+
+    char chosen_answer = (char) wgetch(new_game);
 
     switch (chosen_answer) {
         case 'a':
         case 'b':
         case 'c':
         case 'd':
-            highlight_answer(new_game, question, chosen_answer, game_w, game_h, YELLOW_YELLOW, BLUE_YELLOW);
-            sleep(1);
+            /* If the user chose one of the valid answer options (not hidden!), highlight the answer in yellow;
+             * Wait a second, then check if the answer is right and highlight the chosen answer accordingly;
+             * Return the corresponding flag */
+            if (chosen_answer != hidden_answers[0] && chosen_answer != hidden_answers[1]) {
+                highlight_answer(new_game, question, chosen_answer, game_w, game_h, YELLOW_YELLOW, BLUE_YELLOW);
+                sleep(1);
 
-            highlight_answer(new_game, question, question.correct_answer, game_w, game_h, GREEN_GREEN, BLUE_GREEN);
+                /* Highlight the correct answer in green */
+                highlight_answer(new_game, question, question.correct_answer, game_w, game_h, GREEN_GREEN, BLUE_GREEN);
 
-            if (chosen_answer != question.correct_answer) {
-                highlight_answer(new_game, question, chosen_answer, game_w, game_h, MAGENTA_MAGENTA, BLUE_MAGENTA);
-                return WRONG_ANSWER;
+                /* If the chosen answer was wrong, highlight it in magenta */
+                if (chosen_answer != question.correct_answer) {
+                    highlight_answer(new_game, question, chosen_answer, game_w, game_h, MAGENTA_MAGENTA, BLUE_MAGENTA);
+                    return WRONG_ANSWER;
+                }
+
+                return RIGHT_ANSWER;
             }
 
-            return RIGHT_ANSWER;
+            /* If the answer was hidden display the invalid prompt and wait for another result */
+            goto invalid;
 
-        case 'e':
-            hidden_answers = get_hidden_answers(question.correct_answer);
-            highlight_answer(new_game, question, hidden_answers[0], game_w, game_h, BLUE_BLUE, BLUE_BLUE);
-            highlight_answer(new_game, question, hidden_answers[1], game_w, game_h, BLUE_BLUE, BLUE_BLUE);
-            return FIFTY_FIFTY;
+        case 'e': /* 50-50 */
+            /* If the user chose the 50-50 option for the first time, hide it and set it as used */
+            if (!game->used_5050) {
+                game->used_5050 = TRUE;
 
-        case 'f':
-            if (!game.used_skip) {
+                display_answer(help_window, "50-50", 'E', BLUE_BLUE, BLUE_BLUE, 0, 0);
+                wrefresh(help_window);
+
+                /* Call a function that returns an array of two random chars, representing the answers that should be
+                 * hidden */
+                hidden_answers = get_hidden_answers(question.correct_answer);
+                highlight_answer(new_game, question, hidden_answers[0], game_w, game_h, BLUE_BLUE, BLUE_BLUE);
+                highlight_answer(new_game, question, hidden_answers[1], game_w, game_h, BLUE_BLUE, BLUE_BLUE);
+
+                /* Call the function again recursively until provided with a valid answer */
+                return choose_answer(new_game, help_window, question, game, hidden_answers, game_w, game_h);
+            }
+
+            goto invalid;
+
+        case 'f': /* Skip the question */
+            /* If the skip question option is used for the first time, hide it and set it as used */
+            if (!game->used_skip) {
+                game->used_skip = TRUE;
+
+                display_answer(help_window, "Skip the question", 'F', BLUE_BLUE, BLUE_BLUE, 51, 0);
+                wrefresh(help_window);
+
                 return SKIP_QUESTION;
             }
 
-            print_invalid_message(new_game, game_h, game_w);
-            return choose_answer(new_game, question, game, game_w, game_h);
+            goto invalid;
 
+        case 'q':
+            return QUIT;
+
+        invalid:
         default:
-            print_invalid_message(new_game, game_h, game_w);
-            return choose_answer(new_game, question, game, game_w, game_h);
+            /* If the input provided in invalid, print a prompt and call the function recursively until the user
+             * inserts a valid character */
+            wattron(new_game, COLOR_PAIR(RED_BLUE));
+            mvwprintw(new_game, game_h / 2 + 8, game_w / 2 - 10, "Pick a valid answer!");
+            wrefresh(new_game);
+            return choose_answer(new_game, help_window, question, game, hidden_answers, game_w, game_h);
     }
-}
-
-void print_invalid_message(WINDOW *new_game, const int game_h, const int game_w) {
-    wattron(new_game, COLOR_PAIR(RED_BLUE));
-    mvwprintw(new_game, game_h / 2 + 8, game_w / 2 - 10, "Pick a valid answer!");
-    wrefresh(new_game);
 }
 
 /**
@@ -178,17 +223,24 @@ WINDOW *display_helping_options(const int game_h, const int game_y, const int co
     return help_window;
 }
 
+/**
+ * Return an array of two random characters (not containing the correct answer), representing the answers hidden after
+ * choosing the 50-50 option;
+ */
 char *get_hidden_answers(char correct_answer) {
     const char answers[] = {'a', 'b', 'c', 'd'};
     char *hidden_answers = malloc(2 * sizeof(char));
     int answer_left_index = rand() % 4;
     int j = 0;
 
+    /* Generate a random integer between 0 - 3 (the other answer that will remain shown, besides the correct one),
+     * until the number is different from the index of the correct answer */
     srand(time(0));
     while (answers[answer_left_index] == correct_answer) {
         answer_left_index = rand() % 4;
     }
 
+    /* Add the remaining characters in the hidden array */
     for (int i = 0; i < 4; ++i) {
         if (answers[i] != correct_answer && answers[i] != answers[answer_left_index]) {
             hidden_answers[j] = answers[i];
@@ -199,6 +251,9 @@ char *get_hidden_answers(char correct_answer) {
     return hidden_answers;
 }
 
+/**
+ * Checks the character received as the chosen answer and highlight the corresponding box in the specified colors;
+ */
 void highlight_answer(WINDOW *new_game, const Question question, const char chosen_answer, const int game_w, const int
 game_h, const short box_color, const short text_color) {
     const int left = game_w / 4 - 15;

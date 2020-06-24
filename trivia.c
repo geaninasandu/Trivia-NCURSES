@@ -552,17 +552,16 @@ int main(int argc, char **argv) {
             player_name = set_name_window(rows, cols);
             player_name[strlen(player_name) - 1] = '\0';
 
-            Game game;
-            game = (Game) {
-                    .player_name = strdup(player_name),
-                    .score = 0,
-                    .wrong_answers = 0,
-                    .right_answers = 0,
-                    .used_5050 = FALSE,
-                    .used_skip = FALSE,
-            };
+            Game *game = malloc(sizeof(Game));
+            game->player_name = strdup(player_name);
+            game->score = 0;
+            game->wrong_answers = 0;
+            game->right_answers = 0;
+            game->used_5050 = FALSE;
+            game->used_skip = FALSE;
+            game->question_index = 0;
 
-            start_new_game(game, questions, questions_number, player_name, rows, cols);
+            game = start_new_game(game, questions, questions_number, player_name, rows, cols);
 
             wrefresh(background);
 

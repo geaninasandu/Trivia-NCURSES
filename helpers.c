@@ -111,7 +111,7 @@ void init_colors() {
     init_new_color(COLOR_BLUE, 21, 169, 225);
     init_new_color(COLOR_RED, 232, 49, 136);
     init_new_color(COLOR_YELLOW, 224, 214, 43);
-    init_new_color(COLOR_MAGENTA, 148, 55, 28);
+    init_new_color(COLOR_MAGENTA, 224, 75, 31);
     init_new_color(COLOR_GREEN, 118, 224, 9);
 
     init_pair(1, COLOR_GREEN, COLOR_GREEN);
