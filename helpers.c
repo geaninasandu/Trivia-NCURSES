@@ -130,87 +130,12 @@ void init_colors() {
     refresh();
 }
 
-char *set_name_window(const int rows, const int cols) {
-    const int name_w = cols / 2;
-    const int name_h = rows / 2;
-    const int name_x = (cols - name_w) / 2;
-    const int name_y = (rows - name_h) * 2 / 3;
-
-    int text_box_x = 10;
-    int text_box_y = name_h * 2 / 3;
-
-    char *player_name;
-
-    /* Create a new window requesting the user name */
-    WINDOW *name = newwin(name_h, name_w, name_y, name_x);
-    configure_window(name, name_h, name_w);
-
-    mvwprintw(name, name_h / 3, name_w / 2 - 9, "Insert name here:");
-
-    /* Print the text box */
-    wattron(name, COLOR_PAIR(BLACK_BLACK));
-    for (int i = text_box_x; i <= name_w - 10; i++)
-        mvwprintw(name, text_box_y, i, " ");
-
-    player_name = insert_name(name, text_box_x, text_box_y, cols);
-
-    werase(name);
-    wrefresh(name);
-    delwin(name);
-
-    return player_name;
-}
-
-char *insert_name(WINDOW *name, int text_box_x, int text_box_y, const int cols) {
-    char *player_name = malloc(40 * sizeof(char));
-    int character = 0;
-    int index_char = 0;
-
-    player_name[0] = '\0';
-
-    /* Receive characters and add them to the name string until the Enter key is pressed */
-    while (character != 10) {
-        /* Display the cursor */
-        wattron(name, COLOR_PAIR(RED_RED));
-        mvwprintw(name, text_box_y, text_box_x, " ");
-
-        /* Receive a character from the keyboard */
-        character = wgetch(name);
-
-        /* Display the character */
-        wattron(name, COLOR_PAIR(RED_BLACK));
-        mvwprintw(name, text_box_y, text_box_x, "%c", character);
-
-        /* Add character to the string */
-        player_name[index_char] = (char) character;
-        index_char++;
-        player_name[index_char] = '\0';
-
-        /* Print message if the character limit is exceeded */
-        if (text_box_x == 50) {
-            const char *limit = "Character limit exceeded!";
-
-            wattron(name, COLOR_PAIR(RED_BLUE));
-            mvwprintw(name, text_box_y + 1, (cols - (int) strlen(limit)) / 2, limit);
-            break;
-        }
-
-        /* If the Backspace key is pressed, move the cursor backwards and decrement the string index */
-        if (character == 127) {
-            text_box_x--;
-
-            wattron(name, COLOR_PAIR(RED_RED));
-            mvwprintw(name, text_box_y, text_box_x, " ");
-
-            wattron(name, COLOR_PAIR(BLACK_BLACK));
-            mvwprintw(name, text_box_y, text_box_x + 1, "  ");
-
-            index_char -= 2;
-        } else {
-            text_box_x++;
-        }
-    }
-
-    return player_name;
+/**
+ * Int values swapping
+ */
+void swap(int *x, int *y) {
+    int aux = *x;
+    *x = *y;
+    *y = aux;
 }
 

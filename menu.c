@@ -29,7 +29,6 @@ int display_menu(const int rows, const int cols) {
  * @return      the chosen option
  */
 int choose_option(WINDOW *menu, int menu_h, int menu_w) {
-    const int last_index = 3, first_index = 0;
     const char *instructions = "Use the arrow keys!";
     int current_option = 0, choice = -1;
 
@@ -47,18 +46,18 @@ int choose_option(WINDOW *menu, int menu_h, int menu_w) {
             /* If the Down key was pressed, go to the next option, or to the first one if the selected option was the
              * last one */
             case KEY_DOWN:
-                if (current_option != last_index) {
+                if (current_option != QUIT_GAME) {
                     current_option++;
                 } else {
-                    current_option = first_index;
+                    current_option = NEW_GAME;
                 }
                 break;
 
             case KEY_UP:
-                if (current_option != first_index) {
+                if (current_option != NEW_GAME) {
                     current_option--;
                 } else {
-                    current_option = last_index;
+                    current_option = QUIT_GAME;
                 }
                 break;
 

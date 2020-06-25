@@ -37,8 +37,6 @@ void init_new_color(short COLOR, int red, int green, int blue);
 
 void init_colors();
 
-char *set_name_window(int rows, int cols);
-
-char *insert_name(WINDOW *name, int text_box_x, int text_box_y, int cols);
+void swap(int *x, int *y);
 
 #endif //HELPERS_H

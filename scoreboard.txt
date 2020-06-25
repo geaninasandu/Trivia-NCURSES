@@ -18,3 +18,7 @@ Andrrea;-55
 ceva;-10
 Nume;-10
 Timur;140
+Ceavav;-40
+Geanina111;190
+kkk;-25
+Geanina;-25
