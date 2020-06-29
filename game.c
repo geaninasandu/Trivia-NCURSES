@@ -1,5 +1,11 @@
-#include "game.h"
+#include "headers/game.h"
 
+/**
+ * Create the game window, containing the question and its answers; Perform the necessary actions to handle each user
+ * input for every question; At each step, store the game state to a Game object;
+ *
+ * @return      a flag, representing the exit action chosen by the user;
+ */
 int start_new_game(Game *game, Question *questions, const int questions_number, const char *score_filename, const int
 rows, const int cols) {
     const int game_w = cols - 20;
@@ -36,6 +42,7 @@ rows, const int cols) {
 
         switch (chosen_answer) {
             case RIGHT_ANSWER:
+                /* If the answer was right, increase the score and the number of correct answers */
                 game->score += 10;
                 game->right_answers++;
                 break;
@@ -46,9 +53,12 @@ rows, const int cols) {
                 break;
 
             case SKIP_QUESTION:
+                /* If the skip question option is used, go to the next question */
                 continue;
 
             case QUIT_TO_MENU:
+                /* If the 'q' key is pressed, clear the game window and go back to the menu by returning the right
+                 * flag  */
                 clear_game(game_window, help_window);
                 return QUIT_TO_MENU;
 
@@ -56,15 +66,21 @@ rows, const int cols) {
                 break;
         }
 
+        /* Wait 1 second to display the next question */
         sleep(1);
     }
 
+    /* After finishing the set of questions, clear the game window */
     clear_game(game_window, help_window);
 
+    /* Refresh the two panels */
     display_score_panel(game->score, game->right_answers, game->wrong_answers, rows, cols);
     display_time_window(game->player_name, rows, cols);
+
+    /* Add the new score entry to the score file */
     add_to_scoreboard(score_filename, game->player_name, game->score);
 
+    /* Show the end menu and return the ending option chosen */
     return display_end_menu(game, rows, cols);
 }
 
@@ -159,6 +175,11 @@ int choose_answer(WINDOW *game_window, WINDOW *help_window, const Question quest
     }
 }
 
+/**
+ * Create a new window, asking for the name of the player;
+ *
+ * @return          the player name;
+ */
 char *set_name_window(const int rows, const int cols) {
     const int name_w = cols / 2;
     const int name_h = rows / 2;
@@ -171,26 +192,31 @@ char *set_name_window(const int rows, const int cols) {
     char *player_name;
 
     /* Create a new window requesting the user name */
-    WINDOW *name = newwin(name_h, name_w, name_y, name_x);
-    configure_window(name, name_h, name_w);
+    WINDOW *name_window = newwin(name_h, name_w, name_y, name_x);
+    configure_window(name_window, name_h, name_w);
 
-    mvwprintw(name, name_h / 3, name_w / 2 - 9, "Insert name here:");
+    mvwprintw(name_window, name_h / 3, name_w / 2 - 9, "Insert name here:");
 
     /* Print the text box */
-    wattron(name, COLOR_PAIR(BLACK_BLACK));
+    wattron(name_window, COLOR_PAIR(BLACK_BLACK));
     for (int i = text_box_x; i <= name_w - 10; i++)
-        mvwprintw(name, text_box_y, i, " ");
+        mvwprintw(name_window, text_box_y, i, " ");
 
-    player_name = insert_name(name, text_box_x, text_box_y, cols);
+    player_name = insert_name(name_window, text_box_x, text_box_y, cols);
 
-    werase(name);
-    wrefresh(name);
-    delwin(name);
+    werase(name_window);
+    wrefresh(name_window);
+    delwin(name_window);
 
     return player_name;
 }
 
-char *insert_name(WINDOW *name, int text_box_x, int text_box_y, const int cols) {
+/**
+ * Handle the text insertion;
+ *
+ * @return          the inserted player name;
+ */
+char *insert_name(WINDOW *name_window, int text_box_x, int text_box_y, const int cols) {
     char *player_name = malloc(40 * sizeof(char));
     int character = 0;
     int index_char = 0;
@@ -200,30 +226,30 @@ char *insert_name(WINDOW *name, int text_box_x, int text_box_y, const int cols) 
     /* Receive characters and add them to the name string until the Enter key is pressed */
     while (character != 10) {
         /* Display the cursor */
-        wattron(name, COLOR_PAIR(RED_RED));
-        mvwprintw(name, text_box_y, text_box_x, " ");
+        wattron(name_window, COLOR_PAIR(RED_RED));
+        mvwprintw(name_window, text_box_y, text_box_x, " ");
 
         /* Receive a character from the keyboard */
-        character = wgetch(name);
+        character = wgetch(name_window);
 
         /* If the Backspace key is pressed, move the cursor backwards and decrement the string index */
         if (character == 127) {
             text_box_x--;
 
-            wattron(name, COLOR_PAIR(RED_RED));
-            mvwprintw(name, text_box_y, text_box_x, " ");
+            wattron(name_window, COLOR_PAIR(RED_RED));
+            mvwprintw(name_window, text_box_y, text_box_x, " ");
 
-            wattron(name, COLOR_PAIR(BLACK_BLACK));
-            mvwprintw(name, text_box_y, text_box_x, "  ");
-            wrefresh(name);
+            wattron(name_window, COLOR_PAIR(BLACK_BLACK));
+            mvwprintw(name_window, text_box_y, text_box_x, "  ");
+            wrefresh(name_window);
 
             index_char -= 2;
             continue;
         }
 
         /* Display the character */
-        wattron(name, COLOR_PAIR(RED_BLACK));
-        mvwprintw(name, text_box_y, text_box_x, "%c", character);
+        wattron(name_window, COLOR_PAIR(RED_BLACK));
+        mvwprintw(name_window, text_box_y, text_box_x, "%c", character);
 
         /* Add character to the string */
         player_name[index_char] = (char) character;
@@ -234,8 +260,8 @@ char *insert_name(WINDOW *name, int text_box_x, int text_box_y, const int cols) 
         if (text_box_x == 50) {
             const char *limit = "Character limit exceeded!";
 
-            wattron(name, COLOR_PAIR(RED_BLUE));
-            mvwprintw(name, text_box_y + 1, (cols - (int) strlen(limit)) / 2, limit);
+            wattron(name_window, COLOR_PAIR(RED_BLUE));
+            mvwprintw(name_window, text_box_y + 1, (cols - (int) strlen(limit)) / 2, limit);
             break;
         }
 
@@ -385,11 +411,9 @@ int game_h, const short box_color, const short text_color) {
 }
 
 /**
- * Create a new window, displaying the final score and
- * @param game
- * @param rows
- * @param cols
- * @return
+ * Create a new window, displaying the final score and the options for continuing or exiting the game;
+ *
+ * @return          the exit choice;
  */
 int display_end_menu(const Game *game, const int rows, const int cols) {
     const int end_w = cols * 2 / 3;
@@ -397,6 +421,7 @@ int display_end_menu(const Game *game, const int rows, const int cols) {
     const int end_x = (cols - end_w) / 2;
     const int end_y = (rows - end_h) * 2 / 3;
 
+    /* Create a new window and show the score and number of answers */
     WINDOW *end_window = newwin(end_h, end_w, end_y, end_x);
     configure_window(end_window, end_h, end_w);
 
@@ -407,10 +432,12 @@ int display_end_menu(const Game *game, const int rows, const int cols) {
     mvwprintw(end_window, end_h * 1 / 3 + 2, (end_w - 17) / 2, "Wrong answers: %d", game->wrong_answers);
     wrefresh(end_window);
 
-    int end_choice = choose_end_option(end_window, end_h, end_w);
-    return end_choice;
+    return choose_end_option(end_window, end_h, end_w);
 }
 
+/**
+ * Handle the arrow keys actions for navigating through the options;
+ */
 int choose_end_option(WINDOW *end_window, const int end_h, const int end_w) {
     int current_option = 0, end_choice = -1;
 
@@ -450,6 +477,9 @@ int choose_end_option(WINDOW *end_window, const int end_h, const int end_w) {
     return end_choice;
 }
 
+/**
+ * Highlight the active option with the provided color parameters;
+ */
 void highlight_end_option(WINDOW *end_window, short highlight_color, short text_color, const char *option,
                           const int option_x, const int rows, const int cols) {
     const int option_y = rows * 3 / 4;
@@ -468,8 +498,11 @@ void highlight_end_option(WINDOW *end_window, short highlight_color, short text_
     mvwprintw(end_window, option_y + 1, option_x + text_x, "%s", option);
 }
 
+/**
+ * Navigate between the options and highlight the active and inactive ones accordingly;
+ */
 void display_end_options(WINDOW *end_window, int current_option, int end_h, int end_w) {
-    const char *options[] = {"Leaderboard", "Menu", "Quit"};
+    const char *options[] = {"Scoreboard", "Menu", "Quit"};
 
     int option_x = 2;
 

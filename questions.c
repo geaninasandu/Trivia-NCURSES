@@ -1,4 +1,4 @@
-#include "questions.h"
+#include "headers/questions.h"
 
 /**
  * Open the questions.txt file and parse its content, adding the questions to an array of Question structures;
@@ -189,6 +189,9 @@ void display_question(WINDOW *new_game, char *question, int question_number, con
     }
 }
 
+/**
+ * Show the 4 answer boxes to the window;
+ */
 void display_all_answers(WINDOW *new_game, const Question question, const int game_w, const int game_h) {
     const int left = game_w / 4 - 15;
     const int right = game_w / 4 - 15 + game_w / 2;
@@ -201,9 +204,13 @@ void display_all_answers(WINDOW *new_game, const Question question, const int ga
     display_answer(new_game, question.answer_d, 'D', RED_RED, BLUE_RED, right, bottom);
 }
 
+/**
+ * Print an answer to the screen, coloring its box and text correspondingly;
+ */
 void display_answer(WINDOW *new_game, const char *answer, const char letter, const short box_color, const short
 text_color, const int box_x, const int box_y) {
 
+    /* Print a 3x30 box, containing the answer */
     wattron(new_game, COLOR_PAIR(box_color));
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 30; ++j) {
@@ -211,6 +218,7 @@ text_color, const int box_x, const int box_y) {
         }
     }
 
+    /* Print the answer text */
     wattron(new_game, COLOR_PAIR(text_color));
     mvwprintw(new_game, box_y + 1, box_x + 2, "%c. %s", letter, answer);
 

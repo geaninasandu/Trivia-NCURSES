@@ -1,5 +1,5 @@
-#include "menu.h"
-#include "helpers.h"
+#include "headers/menu.h"
+#include "headers/helpers.h"
 
 /**
  * Create the menu window and return the chosen option
@@ -103,7 +103,7 @@ void highlight_option(WINDOW *menu, short highlight_color, short text_color, con
  * @param current_option    the index of the hovered option
  */
 void display_options(WINDOW *menu, const int current_option, const int rows, const int cols) {
-    const char *options[] = {"New Game", "Resume Game", "Leaderboard", "Quit"};
+    const char *options[] = {"New Game", "Resume Game", "Scoreboard", "Quit"};
     int option_y = rows / 2 - 5;
 
     /* Get the index of the current hovered option and highlight it */

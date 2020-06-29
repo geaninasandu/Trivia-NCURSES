@@ -30,7 +30,7 @@ game_w, int game_h);
 
 char *set_name_window(int rows, int cols);
 
-char *insert_name(WINDOW *name, int text_box_x, int text_box_y, int cols);
+char *insert_name(WINDOW *name_window, int text_box_x, int text_box_y, int cols);
 
 void display_time_window(const char *player_name, int rows, int cols);
 

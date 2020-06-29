@@ -1,24 +1,13 @@
-ceva 2;35
-cvvv3 2;-10
-nume random;50
-bjhgkj;-10
-test;35
-cdsfny;20
-ceva;50
-cebrnty;35
-dsgrhdjfk;35
-dfgh;5
-cernt;-10
-cadsfgnmh,;5
-dsfhdfjg;35
-Geanina;200
-Selveea;130
-Selveea strikes again;200
-Andrrea;-55
-ceva;-10
-Nume;-10
-Timur;140
-Ceavav;-40
-Geanina111;190
-kkk;-25
-Geanina;-25
+Test 1;200
+Test 2;30
+Test 3;140
+Test 4;190
+Test 5;25
+Test 6;-10
+Test 7;100
+Test 8;65
+Test 9;105
+Test 10;200
+Test 11;180
+Test 12;145
+Tamir the Great;200

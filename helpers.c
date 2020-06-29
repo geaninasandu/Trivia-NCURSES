@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "headers/helpers.h"
 
 void init_screen() {
     initscr();
@@ -130,9 +130,6 @@ void init_colors() {
     refresh();
 }
 
-/**
- * Int values swapping
- */
 void swap(int *x, int *y) {
     int aux = *x;
     *x = *y;
